@@ -1,58 +1,18 @@
-prob31 :: Int -> Int
-prob31 0 = 1
-prob31 n = sum $ map prob31 a
-    where a = map (n-) $ filter (<=n) $  [1, 2, 5, 10, 20, 50, 100, 200]
+import Data.List (sort, tails)
+import Data.Function.Memoize (memoize2)
 
---number of ways of making n from list
-f :: Int -> [Int]
-f n list =
-    where tails = tails
-          a = map (n-) $ filter (<=n) $  [1, 2, 5, 10, 20, 50, 100, 200]
+coins = [200, 100, 50, 20, 10, 5, 2, 1]
 
-{-
-8
-    (1+1+1+1+1+1+1) + 1     f 7
-    (1+1+1+1+1+1) + 2       f 6
-    (1+1+1+1+2) + 2
-    (1+1+2+2) + 2
-    (2+2+2) + 2
-    (1+1+1) + 5             f 3
-    (1+2) + 5
+f :: [Int] -> Int -> Int
+f _ n	| (n <  0) = 0
+			| (n == 0) = 1
 
-7
-    (1+1+1+1+1+1) + 1   f 6
-    (1+1+1+1+1) + 2     f 5
-    (1+1+1+2) + 2
-    (1+2+2) + 2
-    (1+1) + 5           f 2
-    (2) + 5
+f list target = case list of
+	[] 	 -> 0
+	x:[] -> if (target `mod` x == 0) then 1 else 0
+	x:xs -> sum $ zipWith memo_f (tails list) (fmap (target-) list)
 
-6
-    (1+1+1+1+1) + 1     f 5
-    (1+1+1+1) + 2       f 4
-    (1+1+2) + 2
-    (2+2) + 2
-    (1) + 5             f 1
+memo_f = memoize2 f
 
-5
-    (1+1+1+1) + 1   f 4
-    (1+1+1) + 2     f 3
-    (1+2) + 2
-    5               f 0
-
-4
-    (1+1+1) + 1     f 3
-    (1+1) + 2       f 2
-    (2) + 2
-
-3
-    (1+1) + 1   f 2
-    (1) + 2     f 1
-
-2
-    (1) + 1     f 1
-    2           f 0
-
-1
-    1           f 0
--}
+main :: IO ()
+main = print $ f coins 200
